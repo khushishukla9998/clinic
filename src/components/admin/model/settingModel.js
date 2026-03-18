@@ -51,10 +51,6 @@ const steps = new mongoose.Schema({
                     ENUM: [ENUM.IS_REQUIRED.NO, ENUM.IS_REQUIRED.YES]
                 },
             },
-        
-        
-    
-
 }, { _id: false });
 
 
