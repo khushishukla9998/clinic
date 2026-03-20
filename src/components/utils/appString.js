@@ -1,4 +1,4 @@
-    module.exports = {
+module.exports = {
 
   // DATABASE
   DATABASE_CONNECT: "Database is connected",
@@ -33,38 +33,52 @@
 
   //  Steps
 
-  STEP_EXIST:"Thise step already exist",
-  STEP_CREATED:"Step created successfully",
-  STEP_NOT_CREATED:" Step not created ! failed",
-
+  STEP_EXIST: "Thise step already exist",
+  STEP_CREATED: "Step created successfully",
+  STEP_NOT_CREATED: " Step not created ! failed",
 
   //USER=============
 
-  MAIL_SEND:"Verification email sent. Please check your inbox.",
-  STREAX_REWARD:" You've reached a 5-day streak! Extra 50 points awarded.",
-  INVALID_VERIFY_TOKEN:"Invalid or expired verification token.",
+  MAIL_SEND: "Verification email sent. Please check your inbox.",
+  STREAX_REWARD: " You've reached a 5-day streak! Extra 50 points awarded.",
+  INVALID_VERIFY_TOKEN: "Invalid or expired verification token.",
   VERIFICATION_FAILED: "Verification failed.",
 
+  //============ Doctor =========================//
+
+  DOCTOR_EXIST: "Doctor already exist",
+  DOCTOR_REGISTER: "Doctor register successfully",
+  DOCTOR_REGISTET_FAILED: "Doctor register error",
+  VERIFY_EMAIL_FIRST: "FIRST VERIFY YOUR EMAIL",
+   DOCTOR_NOT_FOUND: "Doctor not Found",
 
 
 
 
 
 
-//===========MODELS NAMES=================
-
-// ========= Admin side
-
-ADMIN:"Admin",
-SETTING:"Setting",
-STEP:"Step",
 
 
-// ============= doctor Side
+  EMAIL_VERIFIED: "email is verified",
+  EMAIL_OTP_REQUIRED: "email and OTP required",
+  INVALID_OTP: "Otp invalid ",
+  OTP_EXPIRED: " Your OTP is Expired ",
 
-DOCTOR:"Doctor",
+  //===========MODELS NAMES=================
 
-// ============= patients Side
-PATIENTS:"Patient"
+
+
+  // ========= Admin side
+  ADMIN: "Admin",
+  SETTING: "Setting",
+  STEP: "Step",
+
+
+  // ============= doctor Side
+
+  DOCTOR: "Doctor",
+
+  // ============= patients Side
+  PATIENTS: "Patient"
 
 }

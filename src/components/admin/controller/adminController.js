@@ -11,8 +11,8 @@ const bcrypt = require("bcrypt")
 
 const registerAdmin = async function (req, res) {
   try {
-    const { name, email, password, mobileNo, country,countryCode } = req.body;
 
+    const { name, email, password, mobileNo, country, countryCode } = req.body;
     // Check if there is already any admin
     const existingAdmin = await Admin.findOne({
       isDeleted: ENUM.IS_DELETED.NOT_DELETED,
@@ -42,8 +42,7 @@ const registerAdmin = async function (req, res) {
 
     //  Hash password
     const hashpass = await bcrypt.hash(password, 10);
-
-    //  Create admin
+    //Create admin
     const admin = new Admin({
       name,
       email,
@@ -73,7 +72,7 @@ const registerAdmin = async function (req, res) {
     commonUtils.storeAcessTokenInCookie(res, "accessToken", accessToken);
     commonUtils.storeRefreshTokenInCookie(res, "refreshToken", refreshToken);
 
-return commonUtils.sendSuccessResponse(
+    return commonUtils.sendSuccessResponse(
       req,
       res,
       appStrings.REGISTRATION_SUCCESS,
@@ -82,9 +81,9 @@ return commonUtils.sendSuccessResponse(
           id: admin._id,
           name: admin.name,
           email: admin.email,
-          mobileNo:admin.mobileNo,
-          country:admin.country,
-          countryCode:admin.countryCode,
+          mobileNo: admin.mobileNo,
+          country: admin.country,
+          countryCode: admin.countryCode,
           status: ENUM.STATUS.ACTIVE,
         },
         accessToken,
@@ -109,7 +108,7 @@ return commonUtils.sendSuccessResponse(
 const adminLogin = async function (req, res) {
   try {
     const { email, password } = req.body;
-   
+
 
     const admin = await Admin.findOne({
       email,
@@ -164,7 +163,4 @@ const adminLogin = async function (req, res) {
   }
 };
 
-
-
-
-module.exports={adminLogin,registerAdmin}
+module.exports = { adminLogin, registerAdmin }

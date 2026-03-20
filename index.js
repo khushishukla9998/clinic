@@ -5,7 +5,7 @@ const cors = require("cors");
 const config = require("../clinic/config/dev.json");
 const appStrings = require("../clinic/src/components/utils/appString")
 const adminIndex = require("../clinic/src/components/admin/index")
-// const userIndex = require("../clinic/src/components/user/index")
+const doctorIndex = require("../clinic/src/components/doctor/index")
 const http = require("http")
 const app = express();
 const port = config.PORT
@@ -28,7 +28,7 @@ app.use(
 );
 
 app.use("/api/admin", adminIndex);
-// app.use("/api/user", userIndex);
+app.use("/api/doctor", doctorIndex);
 
 const connectDb = async () => {
   try {

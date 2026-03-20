@@ -15,12 +15,11 @@ module.exports = {
         NO: 0
     },
 
-    IS_REQUIRED:{
-        YES:1,
-        NO:0
+    IS_REQUIRED: {
+        YES: 1,
+        NO: 0
     },
-
-    LEAVE_MANAGE: {
+    LEAVE_STATUS: {
         APPROVED: 1,
         REJECTED: 0,
         PENDING: 0,
@@ -30,15 +29,25 @@ module.exports = {
         ACTIVE: 1,
         BANNED: 0
     },
-   ACCOUNT_VERIFIED_STATUS: {
+    ACCOUNT_VERIFIED_STATUS: {
         PENDING: 0,
         VERIFIED: 1,
         REJECTED: 2
     },
 
+    STEP_VERIFIED_STATUS: {
+        SUCCESS: 1,
+        PENDING: 0
+    },
+
     STEP_STATUS: {
         ACTIVE: 1,
         INACTIVE: 0
-    }
+    },
 
+
+        LEAVE_TYPE:{
+            VACATION:1,
+            PERSONAL:2
+        }
 }

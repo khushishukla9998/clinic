@@ -1,6 +1,6 @@
 
 const adminController = require("../admin/controller/adminController")
-const stepController = require("../admin/controller/verificationStepController")
+const stepController = require("./controller/settingController")
 
 module.exports = [
 

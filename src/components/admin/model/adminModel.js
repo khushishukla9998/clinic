@@ -7,32 +7,39 @@ const adminSchema = mongoose.Schema({
         type: String,
         required: true
     },
+
     email: {
         type: String,
         required: true,
         unique: true
     },
+
     password: {
         type: String,
         required: true,
-    },
-    mobileNo: {
+    }, 
+
+    mobileNo:{
         type: Number,
         required: true
-    },
+     },
+
     country: {
         type: String,
         required: true
     },
+
     countryCode: {
         type: String,
         required: true
     },
+
     isEmailVarified:{
         type:Number,
         ENUM:[ENUM.ACCOUNT_VERIFIED.NO,ENUM.ACCOUNT_VERIFIED.YES],
         default:ENUM.ACCOUNT_VERIFIED.NO
     },
+
     isDeleted: {
         type: Number,
         enum: [ENUM.IS_DELETED.DELETED, ENUM.IS_DELETED.NOT_DELETED],
