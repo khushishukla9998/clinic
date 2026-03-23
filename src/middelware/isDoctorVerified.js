@@ -1,0 +1,41 @@
+const jwt = require("jsonwebtoken");
+const config = require("../../config/dev.json");
+const commonUtils = require("../components/utils/commonUtils");
+const appStrings = require("../components/utils/appString");
+const Doctor = require("../components/doctor/model/doctorModel");
+const ENUM = require("../components/utils/enum");
+
+async function isDoctorVerified(req, res, next) {
+    try {
+        // Assume req.userId and req.type are already populated by verifyAcessToken
+        if (req.type !== "DOCTOR") {
+             // If it's accessed by Admin or someone else, let it pass or block depending on logic.
+             // Usually, we just allow the endpoint if it is specifically for doctors.
+             return next();
+        }
+
+        const doctorId = req.userId;
+        const doctor = await Doctor.findById(doctorId);
+
+        if (!doctor) {
+            return commonUtils.sendErrorResponse(req, res, appStrings.USER_NOT_FOUND, null, 404);
+        }
+
+        if (doctor.isAccountVerified !== ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED) {
+            return commonUtils.sendErrorResponse(
+                req, 
+                res, 
+                "Account is not verified. Please complete all required steps and wait for admin approval.", 
+                null, 
+                403
+            );
+        }
+
+        next();
+    } catch (err) {
+        console.error("isDoctorVerified error:", err.message);
+        return commonUtils.sendErrorResponse(req, res, "Internal Server Error", null, 500);
+    }
+}
+
+module.exports = { isDoctorVerified };

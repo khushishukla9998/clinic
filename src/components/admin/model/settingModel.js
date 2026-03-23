@@ -61,54 +61,14 @@ const steps = new mongoose.Schema({
 // ============ Time Slot=================//
 
 const timeSlots = new mongoose.Schema({
-    monady: {
-        key: Date,
-        brakTime: {
-            type: String
-        }
-    },
-
-    tuesday: {
-        key: Date,
-        brakTime: {
-            type: String
-        },
-    },
-
-    wednsday: {
-        key: Date,
-        brakTime: {
-            type: String
-        },
-    },
-    thursday: {
-        key: Date,
-        brakTime: {
-            type: String
-        },
-    },
-    friday: {
-        key: Date,
-        brakTime: {
-            type: String
-        },
-    },
-    saturday: {
-        key: Date,
-        brakTime: {
-            type: String
-        },
-    },
-    sunday: {
-        key: Date,
-        brakTime: {
-            type: String
-        },
-    },
-
-
-
-})
+    monday: { type: Map, of: String },
+    tuesday: { type: Map, of: String },
+    wednesday: { type: Map, of: String },
+    thursday: { type: Map, of: String },
+    friday: { type: Map, of: String },
+    saturday: { type: Map, of: String },
+    sunday: { type: Map, of: String }
+}, { _id: false });
 
 
 //========== Setting ============================//

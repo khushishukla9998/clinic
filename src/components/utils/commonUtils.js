@@ -1,6 +1,7 @@
 const Admin = require("../admin/model/adminModel");
 // const User = require("../user/model/userModel");
-const appStrings = require("../utils/appString")
+const appStrings = require("../utils/appString");
+const Validator = require("validatorjs");
 
 //========================Error Response===========================//
 const sendErrorResponse = (req, res, message, data = null, status = 400) => {
@@ -120,10 +121,20 @@ const routeArray = (array_, prefix, isAdmin = false) => {
 
 
 
+const validatorUtilWithCallback = (req, res, next, rules) => {
+    const validation = new Validator(req.body, rules);
+    if (validation.passes()) {
+        next();
+    } else {
+        return sendErrorResponse(req, res, "Validation failed", validation.errors.all(), 422);
+    }
+};
+
 module.exports = {
     sendErrorResponse,
     sendSuccessResponse,
     storeAcessTokenInCookie,
     storeRefreshTokenInCookie,
-    routeArray
-}
+    routeArray,
+    validatorUtilWithCallback
+};

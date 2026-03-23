@@ -1,6 +1,7 @@
-
 const adminController = require("../admin/controller/adminController")
 const stepController = require("./controller/settingController")
+const adminProfileController = require("./controller/adminProfileController")
+const adminLeaveController = require("../admin/controller/adminLeaveController")
 
 module.exports = [
 
@@ -22,6 +23,26 @@ module.exports = [
     //validation: adminValidation.loginValidation
   },
 
+  {
+    path: "/approveDoctor",
+    method: "post",
+    controller: adminProfileController.approveDoctor,
+  },
+  
+  {
+    path: "/doctorProfile/:id",
+    method: "get",
+    controller: adminProfileController.getDoctorProfile,
+  },
+
+   {
+    path: "/loginAdmin",
+    method: "post",
+    controller: adminController.adminLogin,
+    isPublic: true,
+    //validation: adminValidation.loginValidation
+  },
+
 
   //================steps===================//
 
@@ -30,6 +51,17 @@ module.exports = [
     method: "post",
     controller: stepController.createStep,
     // isPublic: true,
-    //validation: adminValidation.loginValidation
   },
+
+  //========= Admin Leave Management ========//
+  {
+      path: "/leaves",
+      method: "get",
+      controller: adminLeaveController.getAllLeaves,
+  },
+  {
+      path: "/leaves/:id/status",
+      method: "put",
+      controller: adminLeaveController.updateLeaveStatus,
+  }
 ]

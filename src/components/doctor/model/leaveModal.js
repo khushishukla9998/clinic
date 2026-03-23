@@ -34,15 +34,17 @@ const leavSchema = mongoose.Schema({
     },
 
     reason: {
-        type: String
+        type: String // Doctor's reason for the leave
+    },
+    rejectionReason: {
+        type: String // Admin's reason if they reject the leave
     },
     unavailableDates: {
-        key: Map,
+        type: Map,
         of: [timeSlotSchema]
-
     },
 
 
 }, { timestamps: true })
 
-module.exports = mongoose.model("Leave", leavSchema,)
+module.exports = mongoose.model("Leave", leavSchema)

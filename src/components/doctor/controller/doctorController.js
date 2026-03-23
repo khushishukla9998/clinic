@@ -7,8 +7,8 @@ const bcrypt = require("bcrypt");
 const redisClient = require("../../utils/redisClient");
 const sendVerificationEmail = require("../../utils/emailService");
 const config = require("../../../../config/dev.json")
-const Wallet = require("../model/walletModal")
-const Settings = require("../../admin/model/settingModel")
+const Wallet = require("../model/walletModal");
+const Settings = require("../../admin/model/settingModel");
 
 
 //=====================Registration==================================//
@@ -219,41 +219,88 @@ const verifyEmailOtp = async (req, res) => {
 
 //=============== Update Doctor ===========================//
 const updateStep = async (req, res) => {
-    const { key, data } = req.body;
+    try {
+        let { step, ...data } = req.body;
+        
+        // If step 1, gather the names of the uploaded documents that Multer captured
+        if (Number(step) === 1 && req.files && req.files.length > 0) {
+            data.documents = req.files.map(file => file.filename);
+        }
 
-    const doctor = await Doctor.findById(req.id);
-    
-    const { id } = req.params
+        if (!step) {
+            return commonUtils.sendErrorResponse(req, res, "Step number is required", null, 400);
+        }
+        
+        const key = "step" + step; // Maps 1 to "step1"
+        const doctor = await Doctor.findById(req.userId);
+        if (!doctor) return commonUtils.sendErrorResponse(req, res, "Doctor not found", null, 404);
+        
+        const setting = await Settings.findOne();
+        if (!setting || !setting.stepLevel || setting.stepLevel.length === 0) {
+            return commonUtils.sendErrorResponse(req, res, "Step rules not defined by admin yet.", null, 400);
+        }
 
-    const setting = await Settings.findById({ _id: id });
-        console.log('setting:', setting);
-    const stepLevelArray = setting?.stepLevel;
+        const stepLevelObj = setting.stepLevel[0];
+        const stepRule = stepLevelObj[key];
+        
+        if (!stepRule || !stepRule.key) {
+             return commonUtils.sendErrorResponse(req, res, "Invalid step rule in settings", null, 400);
+        }
 
-    console.log("::::::::::::::::::::",stepLevelArray)
+        // Find if this step already exists in doctor.steps
+        const stepIndex = doctor.steps.findIndex(s => s.data && s.data.stepKey === key);
 
-    const step = stepLevelArray.find(s => s.key === key);
-   console.log('Step:', step);
+        if (stepIndex > -1) {
+            doctor.steps[stepIndex].data = { ...data, stepKey: key };
+            doctor.steps[stepIndex].isCompleted = true;
+        } else {
+            doctor.steps.push({
+                // using setting._id just to satisfy schema ref
+                stepId: setting._id,
+                data: { ...data, stepKey: key },
+                isCompleted: true
+            });
+        }
 
-    if (!step) {
-        return res.status(400).json({ message: "Invalid step key" });
+        // reset status
+        doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.PENDING;
+        doctor.rejectionReason = null;
+
+        await doctor.save();
+
+        return commonUtils.sendSuccessResponse(req, res, "Step updated successfully and is pending admin approval.");
+    } catch (err) {
+         return commonUtils.sendErrorResponse(req, res, err.message, null, 500);
     }
-
-    update
-    doctor.data = data;
-    doctor.isCompleted = true;
-
-    // reset status
-    doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.PENDING;
-    doctor.rejectionReason = null;
-
-    await doctor.save();
-
-    res.json({
-        message: "Step updated",
-        // steps:step
-    });
 };
 
+//=============== Edit Doctor Profile =======================//
+const editProfile = async (req, res) => {
+    try {
+        const { name, mobileNo, country, countryCode, appointmentsCharges } = req.body;
+        const doctor = await Doctor.findById(req.userId);
+        if (!doctor) return commonUtils.sendErrorResponse(req, res, "Doctor not found", null, 404);
 
+        let profileEdited = false;
 
-module.exports = { doctorRegister, doctorLogin, verifyEmailOtp, updateStep }
+        if (name && name !== doctor.name) { doctor.name = name; profileEdited = true; }
+        if (mobileNo && mobileNo !== doctor.mobileNo) { doctor.mobileNo = mobileNo; profileEdited = true; }
+        if (country && country !== doctor.country) { doctor.country = country; profileEdited = true; }
+        if (countryCode && countryCode !== doctor.countryCode) { doctor.countryCode = countryCode; profileEdited = true; }
+        if (appointmentsCharges && appointmentsCharges !== doctor.appointmentsCharges) { doctor.appointmentsCharges = appointmentsCharges; profileEdited = true; }
+
+        if (profileEdited) {
+            // As per requirements: "if doctor edit there profile after updation admin should verify afain"
+            doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.PENDING;
+            doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.PENDING;
+            await doctor.save();
+            return commonUtils.sendSuccessResponse(req, res, "Profile updated successfully. Your account is unverified pending Admin approval.", { doctor });
+        }
+
+        return commonUtils.sendSuccessResponse(req, res, "No profile changes made.", { doctor });
+    } catch (err) {
+        return commonUtils.sendErrorResponse(req, res, err.message, null, 500);
+    }
+};
+
+module.exports = { doctorRegister, doctorLogin, verifyEmailOtp, updateStep, editProfile };
