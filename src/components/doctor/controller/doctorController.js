@@ -16,7 +16,7 @@ const Settings = require("../../admin/model/settingModel");
 const doctorRegister = async (req, res) => {
 
     try {
-        const { name, email, password, mobileNo, country, countryCode, appointmentsCharges } = req.body;
+        const {name, email, password, mobileNo, country, countryCode, appointmentsCharges } = req.body;
         const doctor = await Doctor.findOne({ email, isDeleted: ENUM.IS_DELETED.NOT_DELETED, });
         console.log(doctor)
         if (doctor) {
@@ -222,7 +222,7 @@ const updateStep = async (req, res) => {
     try {
         let { step, ...data } = req.body;
         
-        // If step 1, gather the names of the uploaded documents that Multer captured
+       
         if (Number(step) === 1 && req.files && req.files.length > 0) {
             data.documents = req.files.map(file => file.filename);
         }
@@ -231,7 +231,7 @@ const updateStep = async (req, res) => {
             return commonUtils.sendErrorResponse(req, res, "Step number is required", null, 400);
         }
         
-        const key = "step" + step; // Maps 1 to "step1"
+        const key = "step" + step; 
         const doctor = await Doctor.findById(req.userId);
         if (!doctor) return commonUtils.sendErrorResponse(req, res, "Doctor not found", null, 404);
         
@@ -241,13 +241,13 @@ const updateStep = async (req, res) => {
         }
 
         const stepLevelObj = setting.stepLevel[0];
+
         const stepRule = stepLevelObj[key];
         
         if (!stepRule || !stepRule.key) {
              return commonUtils.sendErrorResponse(req, res, "Invalid step rule in settings", null, 400);
         }
 
-        // Find if this step already exists in doctor.steps
         const stepIndex = doctor.steps.findIndex(s => s.data && s.data.stepKey === key);
 
         if (stepIndex > -1) {
@@ -255,14 +255,20 @@ const updateStep = async (req, res) => {
             doctor.steps[stepIndex].isCompleted = true;
         } else {
             doctor.steps.push({
-                // using setting._id just to satisfy schema ref
+              
                 stepId: setting._id,
                 data: { ...data, stepKey: key },
-                isCompleted: true
+            
             });
         }
 
-        // reset status
+
+
+         const newStep = Number(step);
+        if (!doctor.currentStep || newStep > doctor.currentStep) {
+            doctor.currentStep = newStep;
+        }
+        
         doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.PENDING;
         doctor.rejectionReason = null;
 
@@ -290,9 +296,9 @@ const editProfile = async (req, res) => {
         if (appointmentsCharges && appointmentsCharges !== doctor.appointmentsCharges) { doctor.appointmentsCharges = appointmentsCharges; profileEdited = true; }
 
         if (profileEdited) {
-            // As per requirements: "if doctor edit there profile after updation admin should verify afain"
-            doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.PENDING;
-            doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.PENDING;
+           
+            // doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.PENDING;
+            // doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.PENDING;
             await doctor.save();
             return commonUtils.sendSuccessResponse(req, res, "Profile updated successfully. Your account is unverified pending Admin approval.", { doctor });
         }

@@ -37,6 +37,6 @@ const appointmentSchema = new mongoose.Schema({
     }
 }, { timestamps: true });
 
-// Assume appString has APPOINTMENT, if not we just use string.
+
 const modelName = appString.APPOINTMENT || "Appointment";
 module.exports = mongoose.model(modelName, appointmentSchema);

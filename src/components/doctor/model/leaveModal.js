@@ -30,20 +30,21 @@ const leavSchema = mongoose.Schema({
         type: Number,
         ENUM: [ENUM.LEAVE_TYPE.PERSONAL, ENUM.LEAVE_TYPE.VACATION],
         required: true
-
     },
 
     reason: {
-        type: String // Doctor's reason for the leave
+        type: String 
     },
     rejectionReason: {
-        type: String // Admin's reason if they reject the leave
+        type: String 
     },
     unavailableDates: {
         type: Map,
-        of: [timeSlotSchema]
+        of: [timeSlotSchema],
+         category: String
     },
 
+   
 
 }, { timestamps: true })
 

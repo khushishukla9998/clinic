@@ -55,7 +55,7 @@ module.exports = [
 
   //========= Admin Leave Management ========//
   {
-      path: "/leaves",
+      path: "/getleaves",
       method: "get",
       controller: adminLeaveController.getAllLeaves,
   },

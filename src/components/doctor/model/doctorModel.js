@@ -52,17 +52,13 @@ const doctorSchema = mongoose.Schema({
             },
             data: {
                 type: mongoose.Schema.Types.Mixed
-            },
-
-            isCompleted: {
-                type: Boolean,
-                default: false
             }
-        }
+        },
+        { _id: false }
     ],
-    lastStep:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:appString.SETTING
+
+    currentStep: {
+       type:Number
     },
 
     stepVerified: {
@@ -72,11 +68,11 @@ const doctorSchema = mongoose.Schema({
 
     appointmentsCharges: {
         type: Number,
-        required: true
+
     },
 
-    rejectionReason:{
-        type:String
+    rejectionReason: {
+        type: String
     },
 
     otp: String,

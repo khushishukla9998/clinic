@@ -38,22 +38,6 @@ const steps = new mongoose.Schema({
             ENUM: [ENUM.IS_REQUIRED.NO, ENUM.IS_REQUIRED.YES]
         },
     },
-
-    step5: {
-        key: String,
-        isRequired: {
-            type: Number,
-            ENUM: [ENUM.IS_REQUIRED.NO, ENUM.IS_REQUIRED.YES]
-        },
-    },
-
-    step6: {
-        key: String,
-        isRequired: {
-            type: Number,
-            ENUM: [ENUM.IS_REQUIRED.NO, ENUM.IS_REQUIRED.YES]
-        },
-    },
 }, { _id: false });
 
 

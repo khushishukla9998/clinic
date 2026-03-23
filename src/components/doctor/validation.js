@@ -2,37 +2,31 @@ const { validatorUtilWithCallback } = require("../utils/commonUtils");
 
 const profileValidation = async (req, res, next) => {
     
-    // If files were successfully attached by Multer, map them to the body 
-    // so the validation rule can natively verify they exist!
     if (req.files && req.files.length > 0) {
         req.body.documents = req.files;
     }
 
     let validationRule = {
-        step: "required|numeric|min:1|max:6",
+        step: "required",
     };
 
     if (req.body.step == 1) {
         validationRule.documents = "required|array";
     }
     else if (req.body.step == 2) {
-        validationRule.appointmentCharges = "required|numeric|min:0"; // 60 mins only
+        validationRule.appointmentCharges = "required|numeric|min:0|max:2000"; 
     }
     else if (req.body.step == 3) {
-        // Validation for time slots object/array
-        validationRule.availableTimeSlots = "required";
+        validationRule.availableTimeSlots = "array" ;
     }
     else if (req.body.step == 4) {
-        validationRule.qualifications = "required|array";
+        validationRule.qualifications = "array";
     }
     else if (req.body.step == 5) {
-        validationRule.unavailableDates = "required|array";
-    }
-    else if (req.body.step == 6) {
-        validationRule.experienceDetails = "required|array";
+        validationRule.experienceDetails = "array";
     }
 
-    // calling common validator utility
+   
     validatorUtilWithCallback(req, res, next, validationRule);
 };
 

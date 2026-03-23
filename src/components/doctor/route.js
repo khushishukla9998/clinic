@@ -35,7 +35,7 @@ module.exports = [
     {
         path: "/stepUpdate/:id",
         method: "post",
-        middleware: upload.array("documents", 5), // Allow up to 5 documents securely attached
+        middleware: upload.array("documents", 5),
         controller: doctorController.updateStep,
         validation: doctorValidation.profileValidation
     },

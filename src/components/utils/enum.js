@@ -21,7 +21,7 @@ module.exports = {
     },
     LEAVE_STATUS: {
         APPROVED: 1,
-        REJECTED: 0,
+        REJECTED: 2,
         PENDING: 0,
     },
 

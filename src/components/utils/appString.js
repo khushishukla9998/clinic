@@ -30,12 +30,20 @@ module.exports = {
   LOGIN_FAILED: "Login failed ",
   USER_NOT_FOUND: "User not Found",
   WRONG_PASSWORD: "Password is invalid!",
-
   //  Steps
-
   STEP_EXIST: "Thise step already exist",
   STEP_CREATED: "Step created successfully",
   STEP_NOT_CREATED: " Step not created ! failed",
+  //leave
+  LEAVE_FETCHED: "Leave requests retrieved successfully.",
+  PROVIDE_STATUS: "Please provide the status",
+  INVALID_STATUS: "Invalid status.",
+  REJECTION_REASON:"A rejection reason must be provid9ed when rejecting a leave request",
+  LEAVE_NOT_FOUND: "Leave request not found.",
+  LEAVE_ALREADY:"This leave has already been ${leave.leaveStatus} and cannot be changed",
+
+  REJECTION_REASON_ACCOUNT:"A rejection reason must be provid9ed when rejecting Account",
+
 
   //USER=============
 
@@ -50,15 +58,7 @@ module.exports = {
   DOCTOR_REGISTER: "Doctor register successfully",
   DOCTOR_REGISTET_FAILED: "Doctor register error",
   VERIFY_EMAIL_FIRST: "FIRST VERIFY YOUR EMAIL",
-   DOCTOR_NOT_FOUND: "Doctor not Found",
-
-
-
-
-
-
-
-
+  DOCTOR_NOT_FOUND: "Doctor not Found",
   EMAIL_VERIFIED: "email is verified",
   EMAIL_OTP_REQUIRED: "email and OTP required",
   INVALID_OTP: "Otp invalid ",
@@ -66,18 +66,13 @@ module.exports = {
 
   //===========MODELS NAMES=================
 
-
-
   // ========= Admin side
   ADMIN: "Admin",
   SETTING: "Setting",
   STEP: "Step",
 
-
   // ============= doctor Side
-
   DOCTOR: "Doctor",
-
   // ============= patients Side
   PATIENTS: "Patient"
 

@@ -1,40 +1,80 @@
 const Doctor = require("../../doctor/model/doctorModel");
 const ENUM = require("../../utils/enum");
 const commonUtils = require("../../utils/commonUtils");
+const appString = require("../../utils/appString")
+const Settings = require("../model/settingModel")
 
 const approveDoctor = async (req, res) => {
     try {
-        const { doctorId } = req.body;
-        
+        const { doctorId, status, rejectionReason } = req.body;
+
         const doctor = await Doctor.findById(doctorId);
         if (!doctor) {
             return commonUtils.sendErrorResponse(req, res, "Doctor not found.");
         }
 
-        // The admin can review doctor.steps and decide to approve
-        doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED;
-        doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.SUCCESS;
-        doctor.rejectionReason = null;
-        
+        const stepCount = doctor.steps.length;
+        console.log("stepCount::::::::", stepCount)
+
+        const stepId = doctor.stepId
+        console.log("stepId::::::::", stepId)
+
+
+        const setting = await Settings.findOne({ stepId });
+        console.log("settings::::::::", setting)
+
+        const stepsLength = Object.keys(setting.stepLevel).length;
+        console.log("stepsLength:::::", stepsLength);
+
+
+
+        const acStatus = [ENUM.ACCOUNT_VERIFIED_STATUS.REJECTED, ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED]
+
+        if (status == ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED) {
+            doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED;
+            doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.SUCCESS;
+            doctor.rejectionReason = null;
+        }
+        else {
+            if (doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.REJECTED && !rejectionReason) {
+                return commonUtils.sendErrorResponse(req, res, appString.REJECTION_REASON_ACCOUNT, null, 400);
+            }
+
+
+
+            doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.PENDING;
+            doctor.rejectionReason = rejectionReason;
+        }
+
+
+
         await doctor.save();
-        
-        return commonUtils.sendSuccessResponse(req, res, "Doctor account has been verified and granted access.", doctor);
+        const message = doctor.isAccountVerified === ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED
+            ? "Doctor account has been verified and granted access."
+            : "Doctor account has been rejected.";
+
+        return commonUtils.sendSuccessResponse(req, res, message, doctor);
     } catch (error) {
-         return commonUtils.sendErrorResponse(req, res, error.message);
+        return commonUtils.sendErrorResponse(req, res, error.message);
     }
 };
+
+
 
 const getDoctorProfile = async (req, res) => {
     try {
         const doctorId = req.params.id;
-        const doctor = await Doctor.findById(doctorId).populate("steps.stepId"); // Population may not strictly work if stepId ref Setting singleton, but it's safe.
+        const doctor = await Doctor.findById(doctorId).populate("steps.stepId");
         if (!doctor) {
             return commonUtils.sendErrorResponse(req, res, "Doctor not found.");
         }
-        
+
+
+
+
         return commonUtils.sendSuccessResponse(req, res, "Doctor profile details.", doctor);
     } catch (error) {
-         return commonUtils.sendErrorResponse(req, res, error.message);
+        return commonUtils.sendErrorResponse(req, res, error.message);
     }
 };
 
