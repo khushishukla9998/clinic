@@ -64,6 +64,13 @@ module.exports = {
   INVALID_OTP: "Otp invalid ",
   OTP_EXPIRED: " Your OTP is Expired ",
 
+  //============ Patient =========================//
+
+  PATIENT_EXIST: "Patient already exists",
+  PATIENT_REGISTER: "Patient registered successfully",
+  PATIENT_REGISTER_FAILED: "Patient registration failed",
+  PATIENT_NOT_FOUND: "Patient not found",
+
   //===========MODELS NAMES=================
 
   // ========= Admin side
@@ -73,6 +80,7 @@ module.exports = {
 
   // ============= doctor Side
   DOCTOR: "Doctor",
+  APPOINTMENT: "Appointment",
   // ============= patients Side
   PATIENTS: "Patient"
 
