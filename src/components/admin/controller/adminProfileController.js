@@ -10,7 +10,7 @@ const approveDoctor = async (req, res) => {
 
         const doctor = await Doctor.findById(doctorId);
         if (!doctor) {
-            return commonUtils.sendErrorResponse(req, res, "Doctor not found.");
+            return commonUtils.sendErrorResponse(req, res,appString.DOCTOR_NOT_FOUND);
         }
 
         const stepCount = doctor.steps.length;
@@ -50,8 +50,8 @@ const approveDoctor = async (req, res) => {
 
         await doctor.save();
         const message = doctor.isAccountVerified === ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED
-            ? "Doctor account has been verified and granted access."
-            : "Doctor account has been rejected.";
+            ? appString.ACCOUNT_ACCESS
+            : appString.ACCOUNT_RTEJECTED;
 
         return commonUtils.sendSuccessResponse(req, res, message, doctor);
     } catch (error) {
@@ -66,13 +66,13 @@ const getDoctorProfile = async (req, res) => {
         const doctorId = req.params.id;
         const doctor = await Doctor.findById(doctorId).populate("steps.stepId");
         if (!doctor) {
-            return commonUtils.sendErrorResponse(req, res, "Doctor not found.");
+            return commonUtils.sendErrorResponse(req, res, appString.DOCTOR_NOT_FOUND);
         }
 
 
 
 
-        return commonUtils.sendSuccessResponse(req, res, "Doctor profile details.", doctor);
+        return commonUtils.sendSuccessResponse(req, res,appString.PROFILE_DETAIL , doctor);
     } catch (error) {
         return commonUtils.sendErrorResponse(req, res, error.message);
     }

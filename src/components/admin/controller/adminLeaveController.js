@@ -59,8 +59,8 @@ const updateLeaveStatus = async (req, res) => {
             leave.rejectionReason = rejectionReason;
         }
  const message = doctor.isAccountVerified === ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED
-            ? "Doctor leave  has been granted access."
-            : "Doctor leave has been rejected.";
+            ? appString.LEAVE_APPROVED
+            :appString.LEAVE_REJECTED;
 
         await leave.save();
 

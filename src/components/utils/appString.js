@@ -41,8 +41,15 @@ module.exports = {
   REJECTION_REASON:"A rejection reason must be provid9ed when rejecting a leave request",
   LEAVE_NOT_FOUND: "Leave request not found.",
   LEAVE_ALREADY:"This leave has already been ${leave.leaveStatus} and cannot be changed",
-
+  LEAVE_APPROVED:"Doctor leave  has been granted access.",
+  LEAVE_REJECTED: "Doctor leave has been rejected.",
+// doctor profile
   REJECTION_REASON_ACCOUNT:"A rejection reason must be provid9ed when rejecting Account",
+  ACCOUNT_ACCESS:"Doctor account has been verified and granted access.",
+  ACCOUNT_RTEJECTED:"Doctor account has been verified and granted access.",
+  DOCTOR_NOT_FOUND: "Doctor not found.",
+  PROFILE_DETAIL:"Doctor profile details.",
+
 
 
   //USER=============
