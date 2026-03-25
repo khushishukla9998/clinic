@@ -11,6 +11,14 @@ const timeSlotSchema = new mongoose.Schema({
 
 }, { _id: false });
 
+const unavailableDatesSchema = new mongoose.Schema({
+    slots: [timeSlotSchema],
+    category: {
+        type: String,
+        enum: ["full_day", "half_day", "custom"]
+    }
+}, { _id: false });
+
 
 
 //================= Leave Modal ==================//
@@ -40,8 +48,8 @@ const leavSchema = mongoose.Schema({
     },
     unavailableDates: {
         type: Map,
-        of: [timeSlotSchema],
-         category: String
+        of:unavailableDatesSchema,
+       
     },
 
    

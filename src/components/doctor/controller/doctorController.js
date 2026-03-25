@@ -16,7 +16,7 @@ const Settings = require("../../admin/model/settingModel");
 const doctorRegister = async (req, res) => {
 
     try {
-        const {name, email, password, mobileNo, country, countryCode, appointmentsCharges } = req.body;
+        const { name, email, password, mobileNo, country, countryCode, appointmentsCharges } = req.body;
         const doctor = await Doctor.findOne({ email, isDeleted: ENUM.IS_DELETED.NOT_DELETED, });
         console.log(doctor)
         if (doctor) {
@@ -221,31 +221,30 @@ const verifyEmailOtp = async (req, res) => {
 const updateStep = async (req, res) => {
     try {
         let { step, ...data } = req.body;
-        
-       
-        if (Number(step) === 1 && req.files && req.files.length > 0) {
+
+      if (Number(step) === 1 && req.files && req.files.length > 0) {
             data.documents = req.files.map(file => file.filename);
         }
 
         if (!step) {
-            return commonUtils.sendErrorResponse(req, res, "Step number is required", null, 400);
+            return commonUtils.sendErrorResponse(req, res, appStrings.STEP_NO_REQUIRED, null, 400);
         }
-        
-        const key = "step" + step; 
+
+        const key = "step" + step;
         const doctor = await Doctor.findById(req.userId);
-        if (!doctor) return commonUtils.sendErrorResponse(req, res, "Doctor not found", null, 404);
-        
+        if (!doctor) return commonUtils.sendErrorResponse(req, res, appStrings.DOCTOR_NOT_FOUND, null, 404);
+
         const setting = await Settings.findOne();
         if (!setting || !setting.stepLevel || setting.stepLevel.length === 0) {
-            return commonUtils.sendErrorResponse(req, res, "Step rules not defined by admin yet.", null, 400);
+            return commonUtils.sendErrorResponse(req, res, appStrings.RULE_NOT_DEFIN, null, 400);
         }
 
         const stepLevelObj = setting.stepLevel[0];
 
         const stepRule = stepLevelObj[key];
-        
+
         if (!stepRule || !stepRule.key) {
-             return commonUtils.sendErrorResponse(req, res, "Invalid step rule in settings", null, 400);
+            return commonUtils.sendErrorResponse(req, res, appStrings.INVALID_STEP, null, 400);
         }
 
         const stepIndex = doctor.steps.findIndex(s => s.data && s.data.stepKey === key);
@@ -255,28 +254,28 @@ const updateStep = async (req, res) => {
             doctor.steps[stepIndex].isCompleted = true;
         } else {
             doctor.steps.push({
-              
+
                 stepId: setting._id,
                 data: { ...data, stepKey: key },
-            
+
             });
         }
 
 
 
-         const newStep = Number(step);
+        const newStep = Number(step);
         if (!doctor.currentStep || newStep > doctor.currentStep) {
             doctor.currentStep = newStep;
         }
-        
+
         doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.PENDING;
         doctor.rejectionReason = null;
 
         await doctor.save();
 
-        return commonUtils.sendSuccessResponse(req, res, "Step updated successfully and is pending admin approval.");
+        return commonUtils.sendSuccessResponse(req, res, appStrings.STEP_UPDETED);
     } catch (err) {
-         return commonUtils.sendErrorResponse(req, res, err.message, null, 500);
+        return commonUtils.sendErrorResponse(req, res, err.message, null, 500);
     }
 };
 
@@ -285,7 +284,7 @@ const editProfile = async (req, res) => {
     try {
         const { name, mobileNo, country, countryCode, appointmentsCharges } = req.body;
         const doctor = await Doctor.findById(req.userId);
-        if (!doctor) return commonUtils.sendErrorResponse(req, res, "Doctor not found", null, 404);
+        if (!doctor) return commonUtils.sendErrorResponse(req, res, appStrings.DOCTOR_NOT_FOUND, null, 404);
 
         let profileEdited = false;
 
@@ -296,11 +295,10 @@ const editProfile = async (req, res) => {
         if (appointmentsCharges && appointmentsCharges !== doctor.appointmentsCharges) { doctor.appointmentsCharges = appointmentsCharges; profileEdited = true; }
 
         if (profileEdited) {
-           
-            // doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.PENDING;
-            // doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.PENDING;
+
+
             await doctor.save();
-            return commonUtils.sendSuccessResponse(req, res, "Profile updated successfully. Your account is unverified pending Admin approval.", { doctor });
+            return commonUtils.sendSuccessResponse(req, res, "Profile updated successfully", { doctor });
         }
 
         return commonUtils.sendSuccessResponse(req, res, "No profile changes made.", { doctor });

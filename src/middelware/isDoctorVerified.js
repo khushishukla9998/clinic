@@ -7,10 +7,9 @@ const ENUM = require("../components/utils/enum");
 
 async function isDoctorVerified(req, res, next) {
     try {
-        // Assume req.userId and req.type are already populated by verifyAcessToken
-        if (req.type !== "DOCTOR") {
-             // If it's accessed by Admin or someone else, let it pass or block depending on logic.
-             // Usually, we just allow the endpoint if it is specifically for doctors.
+    
+     if (req.type !== "DOCTOR") {
+           
              return next();
         }
 

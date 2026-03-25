@@ -58,17 +58,12 @@ const doctorSchema = mongoose.Schema({
     ],
 
     currentStep: {
-       type:Number
+        type: Number
     },
 
     stepVerified: {
         type: Number,
         Enum: [ENUM.STEP_VERIFIED_STATUS.SUCCESS, ENUM.STEP_VERIFIED_STATUS.PENDING]
-    },
-
-    appointmentsCharges: {
-        type: Number,
-
     },
 
     rejectionReason: {

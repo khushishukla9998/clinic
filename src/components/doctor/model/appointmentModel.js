@@ -9,9 +9,9 @@ const appointmentSchema = new mongoose.Schema({
         required: true
     },
     patientId: {
-        // Optional for now if no Patient model exists, but we'll link it later.
+       
         type: mongoose.Schema.Types.ObjectId,
-        ref: appString.PATIENTS, // Assuming User is patient or will be Patient
+        ref: appString.PATIENTS,
         required: true 
     },
     date: {
@@ -38,5 +38,5 @@ const appointmentSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
-const modelName = appString.APPOINTMENT || "Appointment";
-module.exports = mongoose.model(modelName, appointmentSchema);
+
+module.exports = mongoose.model("Appointment", appointmentSchema);

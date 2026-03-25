@@ -1,11 +1,11 @@
 module.exports = {
 
-  // DATABASE
+  //=============== DATABASE====================
   DATABASE_CONNECT: "Database is connected",
   SERVER_RUNNING: "Server is running on",
   SERVER_ERROR: "Server error!",
 
-  // TOKEN
+  //===================TOKEN====================
   TOKEN_NOT_PROVIDED: "Token not provided!",
   REFRESH_TOKEN_MISSING: "Refresh token missing!",
   ACCESS_TOKEN_REFRESHED: "Access token refreshed",
@@ -14,12 +14,13 @@ module.exports = {
   INVALID_TOKEN_IN_REDISH: "Invalid or expired token in Redis!",
   INVALID_TOKEN: "Invalid or expired token!",
 
-  // REDIS
+  // =================REDIS======================
   REDIS_CONNECT: "Connected to Redis",
   REDIS_CLIENT_ERROR: "'Redis Client Error !'",
   REDIS_FAILED: "Failed to connect to Redis !",
 
-  //ADMIN side===================
+
+  //=================ADMIN side===================
 
   ADMIN_EXIST: "Admin already exists1",
   EMAIL_USE: "Email already in use!",
@@ -43,21 +44,14 @@ module.exports = {
   LEAVE_ALREADY:"This leave has already been ${leave.leaveStatus} and cannot be changed",
   LEAVE_APPROVED:"Doctor leave  has been granted access.",
   LEAVE_REJECTED: "Doctor leave has been rejected.",
-// doctor profile
+ //doctor profile
   REJECTION_REASON_ACCOUNT:"A rejection reason must be provid9ed when rejecting Account",
   ACCOUNT_ACCESS:"Doctor account has been verified and granted access.",
   ACCOUNT_RTEJECTED:"Doctor account has been verified and granted access.",
   DOCTOR_NOT_FOUND: "Doctor not found.",
   PROFILE_DETAIL:"Doctor profile details.",
 
-
-
-  //USER=============
-
-  MAIL_SEND: "Verification email sent. Please check your inbox.",
-  STREAX_REWARD: " You've reached a 5-day streak! Extra 50 points awarded.",
-  INVALID_VERIFY_TOKEN: "Invalid or expired verification token.",
-  VERIFICATION_FAILED: "Verification failed.",
+  
 
   //============ Doctor =========================//
 
@@ -70,17 +64,62 @@ module.exports = {
   EMAIL_OTP_REQUIRED: "email and OTP required",
   INVALID_OTP: "Otp invalid ",
   OTP_EXPIRED: " Your OTP is Expired ",
+ //step
+  STEP_NO_REQUIRED: "Step number is required",
+  RULE_NOT_DEFIN:"Step rules not defined by admin NOW.",
+  INVALID_STEP:"Invalid step rule in settings",
+  STEP_UPDETED: "Step updated successfully and is pending admin approval",
+ // leave
+  FULL_DAY: "full_day",
+  HALF_DAY: "half_day",
+  CUSTOM:"custom_leave",
 
-  //===========MODELS NAMES=================
 
-  // ========= Admin side
+
+
+
+
+//============ Patient =========================//
+
+  PATIENT_EXIST: "Patient already exists",
+  PATIENT_REGISTER: "Patient registered successfully",
+  PATIENT_REGISTER_FAILED: "Patient registration failed",
+  PATIENT_NOT_FOUND: "Patient not found",
+  // get doctor profile
+
+ DOCTOR_GET:"Doctors retrieved successfully",
+ DOCTOR_PROFILE_GET:"Doctor profile retrieved successfully",
+ // Slot
+
+DATE_REQUIRED:"Date is required (format: YYYY-MM-DD)",
+INVALI_DATE:"Invalid date format. Use YYYY-MM-DD",
+PAST_SLOT:"Cannot check slots for past dates",
+NOT_AVAILBLE_SLOT:"Doctor has not set available time slots",
+NOT_AVAILBLE_DAY:"Doctor is not available on this day",
+ON_LEAVE:"Doctor is on leave on this date",
+//appointmjent
+
+PAST_APPOINTMENTS:"Cannot book appointments for past dates.",
+DOCTOR_NOT: "Doctor not found or not verified.",
+ALREADY_BOOK: "This time slot is already booked for the selected doctor. Please choose a different time.",
+DOCTOR_ON_LEAVE_DAY:"Doctor is on leave on this date.",
+DOCTOE_ON_LEAVE_TIMEsLOT: "Doctor is on leave during this time slot.",
+APPOINTMENT_BOOK: "Appointment booked successfully.",
+
+  
+
+//===========MODELS NAMES=================
+
+  //Admin side
   ADMIN: "Admin",
   SETTING: "Setting",
   STEP: "Step",
 
-  // ============= doctor Side
+  //doctor Side
   DOCTOR: "Doctor",
-  // ============= patients Side
-  PATIENTS: "Patient"
+  APPOINTMENT: "Appointment",
+
+  //patients Side
+  PATIENTS: "Patient",
 
 }
