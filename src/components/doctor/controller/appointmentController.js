@@ -1,11 +1,15 @@
 const Appointment = require("../model/appointmentModel");
 const commonUtils = require("../../utils/commonUtils");
 const moment = require("moment");
+const appString = require("../../utils/appString");
+const ENUM = require("../../utils/enum");
 
+
+// ================GET LISST OF APPOINTMENT=================
 
 const getAppointments = async (req, res) => {
     try {
-        // ( ?status=UPCOMING)
+    
         const statusFilter = req.query.status;
 let searchQuery = {
             doctorId: req.userId
@@ -15,12 +19,15 @@ let searchQuery = {
             searchQuery.status = statusFilter.toUpperCase();
         }
         const appointments = await Appointment.find(searchQuery).sort({ date: 1, startTime: 1 });
-        return commonUtils.sendSuccessResponse(req, res, "Appointments retrieved successfully.", appointments);
+        return commonUtils.sendSuccessResponse(req, res, appString,appString.FETCH_SUCESS, appointments);
     } catch (error) {
         return commonUtils.sendErrorResponse(req, res, error.message, null, 500);
     }
 };
 
+
+
+//======================= DETALIS OF APPOINTMENT =========================
 
 const getAppointmentDetails = async (req, res) => {
     try {
@@ -31,14 +38,19 @@ const getAppointmentDetails = async (req, res) => {
             doctorId: req.userId
         });
         if (!appointment) {
-            return commonUtils.sendErrorResponse(req, res, "Appointment not found.", null, 404);
+            return commonUtils.sendErrorResponse(req, res,appString.NOT_FOUND, null, 404);
         }
-        return commonUtils.sendSuccessResponse(req, res, "Appointment details retrieved.", appointment);
+        return commonUtils.sendSuccessResponse(req, res, appString.FETCH_SUCESS, appointment);
     } catch (error) {
         return commonUtils.sendErrorResponse(req, res, error.message, null, 500);
     }
 };
 
+
+
+
+
+//====================== UPDATE STATUS OF APPOINTMENT =============================
 
 const updateAppointmentStatus = async (req, res) => {
     try {
@@ -47,11 +59,11 @@ const updateAppointmentStatus = async (req, res) => {
 
 
         if (newStatus) {
-            newStatus = newStatus.toUpperCase();
+            newStatus = newStatus
         }
-        const allowedStatuses = ["ACCEPTED", "REJECTED", "CANCELLED"];
+        const allowedStatuses = [ENUM.APPOINTMENT_STATUS.ACCEPTED,ENUM.APPOINTMENT_STATUS.CANCELLED,ENUM.APPOINTMENT_STATUS.REJECTED];
         if (!allowedStatuses.includes(newStatus)) {
-            return commonUtils.sendErrorResponse(req, res, "Invalid status. Please use ACCEPTED, REJECTED, or CANCELLED.", null, 400);
+            return commonUtils.sendErrorResponse(req, res,appString.INVALID_AP_STATUS, null, 400);
         }
         const appointment = await Appointment.findOne({
             _id: appointmentId,
@@ -59,10 +71,10 @@ const updateAppointmentStatus = async (req, res) => {
         });
 
         if (!appointment) {
-            return commonUtils.sendErrorResponse(req, res, "Appointment not found.", null, 404);
+            return commonUtils.sendErrorResponse(req, res, appString.NOT_FOUND, null, 404);
         }
-        if (appointment.status === "COMPLETED") {
-            return commonUtils.sendErrorResponse(req, res, "Cannot update an appointment that is already completed.", null, 400);
+        if (appointment.status === ENUM.APPOINTMENT_STATUS.COMPLETED) {
+            return commonUtils.sendErrorResponse(req, res,appString.CAN_NOT_UPDATE , null, 400);
         }
         appointment.status = newStatus;
         await appointment.save();
@@ -73,6 +85,9 @@ const updateAppointmentStatus = async (req, res) => {
     }
 };
 
+
+
+//=====================  RESCHEDULE THE APPOINTMENT ==============================
 
 const rescheduleAppointment = async (req, res) => {
     try {
@@ -85,12 +100,12 @@ const rescheduleAppointment = async (req, res) => {
         });
 
         if (!appointment) {
-            return commonUtils.sendErrorResponse(req, res, "Appointment not found.", null, 404);
+            return commonUtils.sendErrorResponse(req, res, appString.NOT_FOUND, null, 404);
         }
 
-        const blockedStatuses = ["COMPLETED", "CANCELLED", "REJECTED"];
+        const blockedStatuses = [ENUM.APPOINTMENT_STATUS.CANCELLED,ENUM.APPOINTMENT_STATUS.COMPLETED,ENUM.APPOINTMENT_STATUS.REJECTED];
         if (blockedStatuses.includes(appointment.status)) {
-            return commonUtils.sendErrorResponse(req, res, "Cannot reschedule completed, cancelled, or rejected appointments.", null, 400);
+            return commonUtils.sendErrorResponse(req, res, appString.CAN_NOT_RESCHEDULE , null, 400);
         }
 
         const appointmentDateTimeString = `${appointment.date} ${appointment.startTime}`;
@@ -98,11 +113,11 @@ const rescheduleAppointment = async (req, res) => {
         const currentMoment = moment();
         const minutesUntilAppointment = appointmentMoment.diff(currentMoment, 'minutes');
         if (minutesUntilAppointment <= 0) {
-            return commonUtils.sendErrorResponse(req, res, "Cannot reschedule an appointment that has already started or passed.", null, 403);
+            return commonUtils.sendErrorResponse(req, res, appString.CAN_NOT_RESCHEDULE_STARTED ,null, 403);
         }
 
         if (minutesUntilAppointment <= 60) {
-            return commonUtils.sendErrorResponse(req, res, "Appointments starting within 60 minutes cannot be rescheduled.", null, 403);
+            return commonUtils.sendErrorResponse(req, res,appString.APPOINTMENT_STARTED, null, 403);
         }
         if (newDate) {
             appointment.date = newDate;
@@ -113,10 +128,10 @@ const rescheduleAppointment = async (req, res) => {
         if (newEndTime) {
             appointment.endTime = newEndTime;
         }
-        appointment.status = "UPCOMING";
+        appointment.status = ENUM.APPOINTMENT_STATUS.UPCOMING;
         await appointment.save();
 
-        return commonUtils.sendSuccessResponse(req, res, "Appointment rescheduled successfully.", appointment);
+        return commonUtils.sendSuccessResponse(req, res, appString.APPOINTMENT_SUCESS, appointment);
     } catch (error) {
         return commonUtils.sendErrorResponse(req, res, error.message, null, 500);
     }
@@ -128,3 +143,19 @@ module.exports = {
     updateAppointmentStatus,
     rescheduleAppointment
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

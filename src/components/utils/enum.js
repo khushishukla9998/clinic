@@ -46,17 +46,19 @@ module.exports = {
     },
 
 
-        LEAVE_TYPE:{
-            VACATION:1,
-            PERSONAL:2
-        },
-        APPOINTMENT_STATUS: {
-            UPCOMING: "UPCOMING",
-            ONGOING: "ONGOING",
-            COMPLETED: "COMPLETED",
-            CANCELLED: "CANCELLED",
-            REJECTED: "REJECTED",
-            PENDING: "PENDING",
-            ACCEPTED: "ACCEPTED"
-        }
+    LEAVE_TYPE: {
+        VACATION: 1,
+        PERSONAL: 2
+    },
+
+
+    APPOINTMENT_STATUS: {
+        UPCOMING: 6,
+        ONGOING: 5,
+        COMPLETED: 4,
+        CANCELLED: 3,
+        REJECTED: 2,
+        PENDING: 0,
+        ACCEPTED: 1
+    }
 }

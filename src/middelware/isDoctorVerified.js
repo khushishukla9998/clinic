@@ -4,13 +4,14 @@ const commonUtils = require("../components/utils/commonUtils");
 const appStrings = require("../components/utils/appString");
 const Doctor = require("../components/doctor/model/doctorModel");
 const ENUM = require("../components/utils/enum");
+const appString = require("../components/utils/appString");
 
 async function isDoctorVerified(req, res, next) {
     try {
-    
-     if (req.type !== "DOCTOR") {
-           
-             return next();
+
+        if (req.type !== "DOCTOR") {
+
+            return next();
         }
 
         const doctorId = req.userId;
@@ -22,10 +23,10 @@ async function isDoctorVerified(req, res, next) {
 
         if (doctor.isAccountVerified !== ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED) {
             return commonUtils.sendErrorResponse(
-                req, 
-                res, 
-                "Account is not verified. Please complete all required steps and wait for admin approval.", 
-                null, 
+                req,
+                res,
+                appString.NOT_ACCESSIBLE,
+                null,
                 403
             );
         }
@@ -33,7 +34,7 @@ async function isDoctorVerified(req, res, next) {
         next();
     } catch (err) {
         console.error("isDoctorVerified error:", err.message);
-        return commonUtils.sendErrorResponse(req, res, "Internal Server Error", null, 500);
+        return commonUtils.sendErrorResponse(req, res, appString.INTERNAL_ERROR, null, 500);
     }
 }
 

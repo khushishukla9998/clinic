@@ -1,11 +1,13 @@
 module.exports = {
 
   //=============== DATABASE====================
+
   DATABASE_CONNECT: "Database is connected",
   SERVER_RUNNING: "Server is running on",
   SERVER_ERROR: "Server error!",
 
   //===================TOKEN====================
+
   TOKEN_NOT_PROVIDED: "Token not provided!",
   REFRESH_TOKEN_MISSING: "Refresh token missing!",
   ACCESS_TOKEN_REFRESHED: "Access token refreshed",
@@ -15,6 +17,7 @@ module.exports = {
   INVALID_TOKEN: "Invalid or expired token!",
 
   // =================REDIS======================
+
   REDIS_CONNECT: "Connected to Redis",
   REDIS_CLIENT_ERROR: "'Redis Client Error !'",
   REDIS_FAILED: "Failed to connect to Redis !",
@@ -64,6 +67,7 @@ module.exports = {
   EMAIL_OTP_REQUIRED: "email and OTP required",
   INVALID_OTP: "Otp invalid ",
   OTP_EXPIRED: " Your OTP is Expired ",
+  
  //step
   STEP_NO_REQUIRED: "Step number is required",
   RULE_NOT_DEFIN:"Step rules not defined by admin NOW.",
@@ -74,7 +78,14 @@ module.exports = {
   HALF_DAY: "half_day",
   CUSTOM:"custom_leave",
 
+PROVIDE_DATE:"Please provide the dates you will be unavailable.",
+CAN_NOT_BOOK:"Cannot apply full day, slots already exist",
+LEAVE_SUCCESS:   "Leave request processed successfully.",
 
+//APPPOINTMENTS
+FETCH_SUCESS:"Appointments retrieved successfully.",
+NOT_FOUND: "Appointment not found.",
+INVALID_AP_STATUS: "Invalid status. Please use ACCEPTED for(1), REJECTED for(2), or CANCELLED(3).",
 
 
 
@@ -117,10 +128,12 @@ NEW_SLOT_BOOKED: "The new time slot is already booked. Please choose a different
 APPOINTMENT_RESCHEDULED: "Appointment rescheduled successfully.",
 APPOINTMENT_CANCELLED: "Appointment cancelled successfully.",
 CANNOT_CANCEL: "Cannot cancel an appointment that is already ",
-
-  
-
-//===========MODELS NAMES=================
+CAN_NOT_UPDATE:"Cannot update an appointment that is already completed.",
+CAN_NOT_RESCHEDULE:"Cannot reschedule completed, cancelled, or rejected appointments.",
+CAN_NOT_RESCHEDULE_STARTED:  "Cannot reschedule an appointment that has already started or passed.", 
+APPOINTMENT_STARTED: "Appointments starting within 60 minutes cannot be rescheduled.",
+APPOINTMENT_SUCESS:"Appointment rescheduled successfully.",
+//===========MODELS NAMES======================//
 
   //Admin side
   ADMIN: "Admin",
@@ -134,4 +147,8 @@ CANNOT_CANCEL: "Cannot cancel an appointment that is already ",
   //patients Side
   PATIENTS: "Patient",
 
+
+
+  NOT_ACCESSIBLE: "Account is not verified. Please complete all required steps and wait for admin approval.", 
+INTERNAL_ERROR:"Internal Server Error",
 }

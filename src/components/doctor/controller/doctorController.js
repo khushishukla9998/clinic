@@ -301,7 +301,7 @@ const editProfile = async (req, res) => {
             return commonUtils.sendSuccessResponse(req, res, "Profile updated successfully", { doctor });
         }
 
-        return commonUtils.sendSuccessResponse(req, res, "No profile changes made.", { doctor });
+        return commonUtils.sendSuccessResponse(req, res, "No profile changes", { doctor });
     } catch (err) {
         return commonUtils.sendErrorResponse(req, res, err.message, null, 500);
     }

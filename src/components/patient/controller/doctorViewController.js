@@ -3,7 +3,7 @@ const Leave = require("../../doctor/model/leaveModal");
 const ENUM = require("../../utils/enum");
 const commonUtils = require("../../utils/commonUtils");
 const appString = require("../../utils/appString");
-
+const Setting = require("../../admin/model/settingModel")
 
 //===================== List Doctors with Filters ==================================//
 
@@ -24,7 +24,7 @@ const getDoctors = async (req, res) => {
 
         const total = await Doctor.countDocuments(query);
         console.log(query)
-    
+
         let doctors = await Doctor.find(query)
             .select("-password -otp -otpExpire -emailOtp -emailOtpExpire -emailOtpLastSend -mobileOtpLastSend -steps")
             .skip(skip)
@@ -88,26 +88,26 @@ const getDoctorProfile = async (req, res) => {
         };
 
 
-        if (doctor.steps && doctor.steps.length > 0) {
-            for (const step of doctor.steps) {
-                if (!step.data) continue;
-                switch (step.data.stepKey) {
-                    case "step1":
-                        profile.documents = step.data.documents || null;
-                        break;
-                    case "step3":
-                        profile.availableTimeSlots = step.data.availableTimeSlots || null;
-                        break;
-                    case "step4":
-                        profile.qualifications = step.data.qualifications || null;
-                        break;
-                    case "step5":
-                        profile.experience = step.data.experienceDetails || null;
-                        break;
-                }
-            }
-        }
-      const leaves = await Leave.find({
+        // if (doctor.steps && doctor.steps.length > 0) {
+        //     for (const step of doctor.steps) {
+        //         if (!step.data) continue;
+        //         switch (step.data.stepKey) {
+        //             case "step1":
+        //                 profile.documents = step.data.documents || null;
+        //                 break;
+        //             case "step3":
+        //                 profile.availableTimeSlots = step.data.availableTimeSlots || null;
+        //                 break;
+        //             case "step4":
+        //                 profile.qualifications = step.data.qualifications || null;
+        //                 break;
+        //             case "step5":
+        //                 profile.experience = step.data.experienceDetails || null;
+        //                 break;
+        //         }
+        //     }
+        // }
+        const leaves = await Leave.find({
             doctorId: doctorId,
             leaveStatus: ENUM.LEAVE_STATUS.APPROVED,
         });
@@ -124,8 +124,8 @@ const getDoctorProfile = async (req, res) => {
 };
 
 
-
 //===================== Get Available Doctors Today ==================================//
+
 
 const getAvailableDoctorsToday = async (req, res) => {
     try {
@@ -134,7 +134,7 @@ const getAvailableDoctorsToday = async (req, res) => {
         const month = String(today.getMonth() + 1).padStart(2, '0');
         const day = String(today.getDate()).padStart(2, '0');
         const dateString = `${year}-${month}-${day}`;
-        
+
         const dayName = today.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
 
         let query = {
@@ -143,8 +143,7 @@ const getAvailableDoctorsToday = async (req, res) => {
         };
 
         const fullDayLeaves = await Leave.find({
-            leaveStatus: ENUM.LEAVE_STATUS.APPROVED,
-            [`unavailableDates.${dateString}.category`]: 'full_day'
+            leaveStatus: ENUM.LEAVE_STATUS.APPROVED, [`unavailableDates.${dateString}.category`]: appString.FULL_DAY
         }).select('doctorId');
 
         const excludedDoctorIds = fullDayLeaves.map(leave => leave.doctorId);
@@ -152,7 +151,7 @@ const getAvailableDoctorsToday = async (req, res) => {
             query._id = { $nin: excludedDoctorIds };
         }
 
-        // Filter by the required day dynamically from the database using $elemMatch
+
         query["steps"] = {
             $elemMatch: {
                 "data.stepKey": "step3",
@@ -164,10 +163,15 @@ const getAvailableDoctorsToday = async (req, res) => {
             }
         };
 
+   const settings = await Setting.findOne().select('timeSlot');
+
+        console.log(settings.timeSlot)
+
         let doctors = await Doctor.find(query)
             .select("-password -otp -otpExpire -emailOtp -emailOtpExpire -emailOtpLastSend -mobileOtpLastSend")
             .sort({ createdAt: -1 });
 
+        console.log("doctors", doctors)
         const cleanedDoctors = doctors.map(doc => {
             const docObj = doc.toObject();
             delete docObj.steps;
@@ -182,6 +186,7 @@ const getAvailableDoctorsToday = async (req, res) => {
         console.error("Error fetching available doctors today:", error);
         return commonUtils.sendErrorResponse(req, res, error.message, null, 500);
     }
+
 };
 
 module.exports = { getDoctors, getDoctorProfile, getAvailableDoctorsToday };

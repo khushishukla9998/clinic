@@ -1,6 +1,6 @@
 const Leave = require("../model/leaveModal");
 const commonUtils = require("../../utils/commonUtils");
-const appStrings= require("../../utils/appString");
+const appStrings = require("../../utils/appString");
 const appString = require("../../utils/appString");
 
 // ================= TIME CONVERTER =================
@@ -40,12 +40,12 @@ const requestLeave = async (req, res) => {
     try {
         const { unavailableDates, leaveType, reason } = req.body;
 
-    
+
         if (!unavailableDates || Object.keys(unavailableDates).length === 0) {
             return commonUtils.sendErrorResponse(
                 req,
                 res,
-                "Please provide the dates you will be unavailable.",
+                appString.PROVIDE_DATE,
                 null,
                 400
             );
@@ -63,7 +63,7 @@ const requestLeave = async (req, res) => {
 
             const diffDays = (leaveDate - today) / (1000 * 60 * 60 * 24);
 
-            
+
             if (diffDays < 3) {
                 return commonUtils.sendErrorResponse(
                     req,
@@ -76,10 +76,12 @@ const requestLeave = async (req, res) => {
 
             const slots = unavailableDates[date];
 
-      
+
             const category = getLeaveCategory(slots);
 
+
             // ================= CHECK EXISTING =================
+
             const existing = await Leave.findOne({
                 doctorId: req.userId,
                 [`unavailableDates.${date}`]: { $exists: true }
@@ -89,7 +91,7 @@ const requestLeave = async (req, res) => {
 
                 const existingData = existing.unavailableDates.get(date);
 
-            
+
                 if (!existingData.slots || existingData.slots.length === 0) {
                     return res.status(400).json({
                         message: `Full day already booked on ${date}`
@@ -97,13 +99,11 @@ const requestLeave = async (req, res) => {
                 }
 
                 if (!slots || slots.length === 0) {
-                    return res.status(400).json({
-                        message: `Cannot apply full day, slots already exist`
-                        
-                    });
+                    return commonUtils.sendErrorResponse(req, res, appString.CAN_NOT_BOOK)
+
                 }
 
-          
+
                 for (let newSlot of slots) {
                     for (let oldSlot of existingData.slots) {
 
@@ -120,7 +120,7 @@ const requestLeave = async (req, res) => {
                     }
                 }
 
-             
+
                 const mergedSlots = [...existingData.slots, ...slots];
 
                 updateQuery[`unavailableDates.${date}`] = {
@@ -130,7 +130,7 @@ const requestLeave = async (req, res) => {
 
             } else {
 
-     
+
                 updateQuery[`unavailableDates.${date}`] = {
                     slots: slots || [],
                     category
@@ -157,7 +157,7 @@ const requestLeave = async (req, res) => {
         return commonUtils.sendSuccessResponse(
             req,
             res,
-            "Leave request processed successfully.",
+            appString.LEAVE_SUCCESS,
             leave
         );
 

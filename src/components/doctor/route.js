@@ -1,7 +1,7 @@
 
 const doctorController = require("../doctor/controller/doctorController")
 const leaveController = require("../doctor/controller/leaveController")
-// const appointmentController = require("../doctor/controller/appointmentController")
+const appointmentController = require("../doctor/controller/appointmentController")
 const { isDoctorVerified } = require("../../middelware/isDoctorVerified");
 const doctorValidation = require("./validation");
 const upload = require("../../middelware/upload");
@@ -55,28 +55,28 @@ module.exports = [
     },
 
     //========= Appointment Management ========//
-    // {
-    //     path: "/appointments",
-    //     method: "get",
-    //     controller: appointmentController.getAppointments,
-    //     validation: isDoctorVerified
-    // },
-    // {
-    //     path: "/appointments/:id",
-    //     method: "get",
-    //     controller: appointmentController.getAppointmentDetails,
-    //     validation: isDoctorVerified
-    // },
-    // {
-    //     path: "/appointments/:id/status",
-    //     method: "put",
-    //     controller: appointmentController.updateAppointmentStatus,
-    //     validation: isDoctorVerified
-    // },
-    // {
-    //     path: "/appointments/:id/reschedule",
-    //     method: "put",
-    //     controller: appointmentController.rescheduleAppointment,
-    //     validation: isDoctorVerified
-    // }
+    {
+        path: "/appointments",
+        method: "get",
+        controller: appointmentController.getAppointments,
+        validation: isDoctorVerified
+    },
+    {
+        path: "/appointments/:id",
+        method: "get",
+        controller: appointmentController.getAppointmentDetails,
+        validation: isDoctorVerified
+    },
+    {
+        path: "/appointments/:id/status",
+        method: "put",
+        controller: appointmentController.updateAppointmentStatus,
+        validation: isDoctorVerified
+    },
+    {
+        path: "/appointments/:id/reschedule",
+        method: "put",
+        controller: appointmentController.rescheduleAppointment,
+        validation: isDoctorVerified
+    }
 ]
