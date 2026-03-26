@@ -15,21 +15,21 @@ module.exports = [
         method: "post",
         controller: doctorController.doctorRegister,
         isPublic: true,
-        // validation: adminValidation.registerValidation
+        validation: doctorValidation.registerValidation
     },
    {
         path: "/loginDoctor",
         method: "post",
         controller: doctorController.doctorLogin,
         isPublic: true,
-        // validation: adminValidation.registerValidation
+        validation: doctorValidation.loginValidation
     },
 
        {
         path: "/verifyOtp",
         method: "post",
         controller: doctorController.verifyEmailOtp,
-        // validation: adminValidation.registerValidation
+        validation: doctorValidation.verifyOtpValidation
     },
 
     {
@@ -44,14 +44,14 @@ module.exports = [
         path: "/editProfile",
         method: "post",
         controller: doctorController.editProfile,
-        // Profile editing shouldn't require verification 
+        validation: doctorValidation.editProfileValidation
     },
 
      {
         path: "/requestLeave",
         method: "post",
         controller: leaveController.requestLeave,
-        validation: isDoctorVerified
+        validation: doctorValidation.requestLeaveValidation
     },
 
     //========= Appointment Management ========//

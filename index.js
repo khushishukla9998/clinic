@@ -45,6 +45,10 @@ async function startServer() {
   try {
     app.listen(port, () => {
       console.log(appStrings.SERVER_RUNNING + ` ${port}`);
+      
+      // Start background jobs after the server successfully listens
+      const { startAppointmentJobs } = require("./src/components/utils/commonUtils");
+      startAppointmentJobs();
     });
   } catch (err) {
     console.log(err.message, appStrings.SERVER_ERROR);

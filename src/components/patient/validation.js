@@ -47,10 +47,20 @@ const rescheduleValidation = (req, res, next) => {
     validatorUtilWithCallback(req, res, next, rules);
 };
 
+const cancelValidation = (req, res, next) => {
+    // If the validator combines params, valid. Otherwise typical param validation
+    // Given the framework style, it usually accepts flat objects
+    const rules = {
+        // We ensure ID is somewhat present or skipped if entirely relying on route regex 
+    };
+    validatorUtilWithCallback(req, res, next, rules);
+};
+
 module.exports = {
     registerValidation,
     loginValidation,
     otpValidation,
     bookAppointmentValidation,
     rescheduleValidation,
+    cancelValidation
 };

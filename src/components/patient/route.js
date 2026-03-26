@@ -30,6 +30,11 @@ module.exports = [
 
     //============= Doctor Profile Viewing =============//
     {
+        path: "/doctors/available-today",
+        method: "get",
+        controller: doctorViewController.getAvailableDoctorsToday,
+    },
+    {
         path: "/doctors",
         method: "get",
         controller: doctorViewController.getDoctors,
@@ -72,5 +77,6 @@ module.exports = [
         path: "/appointments/:id/cancel",
         method: "put",
         controller: appointmentController.cancelAppointment,
+        validation: patientValidation.cancelValidation
     },
 ];

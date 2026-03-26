@@ -10,7 +10,7 @@ const approveDoctor = async (req, res) => {
 
         const doctor = await Doctor.findById(doctorId);
         if (!doctor) {
-            return commonUtils.sendErrorResponse(req, res,appString.DOCTOR_NOT_FOUND);
+            return commonUtils.sendErrorResponse(req, res, appString.DOCTOR_NOT_FOUND);
         }
 
         const stepCount = doctor.steps.length;
@@ -20,10 +20,14 @@ const approveDoctor = async (req, res) => {
         console.log("stepId::::::::", stepId)
 
 
-        const setting = await Settings.findOne({ stepId });
+
+        const setting = await Settings.findOne();
         console.log("settings::::::::", setting)
 
-        const stepsLength = Object.keys(setting.stepLevel).length;
+
+        const stepsLength = setting && setting.stepLevel && setting.stepLevel.length > 0
+            ? Object.keys(setting.stepLevel[0].toJSON()).filter(k => k.startsWith('step')).length
+            : 0;
         console.log("stepsLength:::::", stepsLength);
 
 
@@ -31,17 +35,25 @@ const approveDoctor = async (req, res) => {
         const acStatus = [ENUM.ACCOUNT_VERIFIED_STATUS.REJECTED, ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED]
 
         if (status == ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED) {
+
+            if (stepCount !== stepsLength) {
+                doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.REJECTED;
+                doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.PENDING;
+                doctor.rejectionReason = "First complete your all steps";
+                await doctor.save();
+                return commonUtils.sendErrorResponse(req, res, "First complete your all steps", null, 400);
+            }
+
             doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED;
             doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.SUCCESS;
             doctor.rejectionReason = null;
         }
         else {
-            if (doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.REJECTED && !rejectionReason) {
+            if (status == ENUM.ACCOUNT_VERIFIED_STATUS.REJECTED && !rejectionReason) {
                 return commonUtils.sendErrorResponse(req, res, appString.REJECTION_REASON_ACCOUNT, null, 400);
             }
 
-
-
+            doctor.isAccountVerified = ENUM.ACCOUNT_VERIFIED_STATUS.REJECTED;
             doctor.stepVerified = ENUM.STEP_VERIFIED_STATUS.PENDING;
             doctor.rejectionReason = rejectionReason;
         }
@@ -72,7 +84,7 @@ const getDoctorProfile = async (req, res) => {
 
 
 
-        return commonUtils.sendSuccessResponse(req, res,appString.PROFILE_DETAIL , doctor);
+        return commonUtils.sendSuccessResponse(req, res, appString.PROFILE_DETAIL, doctor);
     } catch (error) {
         return commonUtils.sendErrorResponse(req, res, error.message);
     }

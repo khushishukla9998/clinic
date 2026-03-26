@@ -64,8 +64,12 @@ const settingSchema = mongoose.Schema({
 
     timeSlot: {
         type: [timeSlots]
-    }
+    },
 
+    patientRegistrationBonus: {
+        type: Number,
+        default: 1000
+    }
 
 })
 module.exports = mongoose.model(appString.SETTING, settingSchema)

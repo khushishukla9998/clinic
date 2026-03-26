@@ -15,10 +15,10 @@ const getAvailableSlots = async (req, res) => {
         console.log(doctorId)
         const { date, duration = 30 } = req.query; 
         let query = {
-                    id: doctorId,
-                    isAccountVerified: ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED,
-                    isDeleted: ENUM.IS_DELETED.NOT_DELETED,
-                };
+            _id: doctorId,
+            isAccountVerified: ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED,
+            isDeleted: ENUM.IS_DELETED.NOT_DELETED,
+        };
 
         if (!date) {
             return commonUtils.sendErrorResponse(req, res,appString.DATE_REQUIRED , null, 400);
@@ -35,8 +35,8 @@ const getAvailableSlots = async (req, res) => {
 
         // const doctor = await Doctor.findOne({id: doctorId,isAccountVerified: ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED,isDeleted: ENUM.IS_DELETED.NOT_DELETED});
 
-            let doctor = await Doctor.find(query)
-        console.log(doctor)
+        let doctor = await Doctor.findOne(query);
+        console.log(doctor);
         if (!doctor) {
             return commonUtils.sendErrorResponse(req, res, appString.DOCTOR_NOT_FOUND, null, 404);
         }
@@ -90,7 +90,7 @@ const getAvailableSlots = async (req, res) => {
         const existingAppointments = await Appointment.find({
             doctorId: doctorId,
             date: date,
-            status: { $nin: ["CANCELLED", "REJECTED"] }
+            status: { $nin: [ENUM.APPOINTMENT_STATUS.CANCELLED, ENUM.APPOINTMENT_STATUS.REJECTED] }
         });
 
       
@@ -136,7 +136,7 @@ const getAvailableSlots = async (req, res) => {
             }
         }
 
-        return commonUtils.sendSuccessResponse(req, res, "Available slots retrieved successfully.", {
+        return commonUtils.sendSuccessResponse(req, res, appString.AVAILABLE_SLOTS_RETRIEVED, {
             doctorId,
             date,
             duration: slotDuration,
@@ -157,7 +157,7 @@ const bookAppointment = async (req, res) => {
         
 
         if (!doctorId || !date || !startTime || !endTime) {
-            return commonUtils.sendErrorResponse(req, res, "doctorId, date, startTime, and endTime are required.", null, 400);
+            return commonUtils.sendErrorResponse(req, res, appString.MISSING_BOOKING_DETAILS, null, 400);
         }
 
 
@@ -185,7 +185,7 @@ const bookAppointment = async (req, res) => {
         const overlapping = await Appointment.findOne({
             doctorId,
             date,
-            status: { $nin: ["CANCELLED", "REJECTED"] },
+            status: { $nin: [ENUM.APPOINTMENT_STATUS.CANCELLED, ENUM.APPOINTMENT_STATUS.REJECTED] },
             $or: [
                 {
                     startTime: { $lt: endTime },
@@ -228,7 +228,18 @@ const bookAppointment = async (req, res) => {
                 }
             }
         }
-        const appointmentCharge = doctor.appointmentsCharges || 0;
+        let appointmentCharge = 0;
+        if (doctor.steps && doctor.steps.length > 0) {
+            for (const step of doctor.steps) {
+                if (step.data && step.data.appointmentsCharges) {
+                    appointmentCharge = Number(step.data.appointmentsCharges);
+                    break;
+                }
+            }
+        }
+        if (!appointmentCharge && doctor.appointmentsCharges) {
+            appointmentCharge = Number(doctor.appointmentsCharges);
+        }
 
         const appointment = new Appointment({
             doctorId,
@@ -236,7 +247,7 @@ const bookAppointment = async (req, res) => {
             date,
             startTime,
             endTime,
-            status: "PENDING",
+            status: ENUM.APPOINTMENT_STATUS.PENDING,
             appointmentCharge,
         });
 
@@ -272,7 +283,7 @@ const getAppointments = async (req, res) => {
 
         const total = await Appointment.countDocuments(searchQuery);
 
-        return commonUtils.sendSuccessResponse(req, res, "Appointments retrieved successfully.", {
+        return commonUtils.sendSuccessResponse(req, res, appString.APPOINTMENTS_RETRIEVED, {
             appointments,
             pagination: {
                 total,
@@ -299,10 +310,10 @@ const getAppointmentDetails = async (req, res) => {
         }).populate("doctorId", "name email mobileNo country appointmentsCharges");
 
         if (!appointment) {
-            return commonUtils.sendErrorResponse(req, res, "Appointment not found.", null, 404);
+            return commonUtils.sendErrorResponse(req, res, appString.APPOINTMENT_NOT_FOUND, null, 404);
         }
 
-        return commonUtils.sendSuccessResponse(req, res, "Appointment details retrieved.", appointment);
+        return commonUtils.sendSuccessResponse(req, res, appString.APPOINTMENT_DETAILS_RETRIEVED, appointment);
     } catch (error) {
         return commonUtils.sendErrorResponse(req, res, error.message, null, 500);
     }
@@ -325,9 +336,9 @@ const rescheduleAppointment = async (req, res) => {
             return commonUtils.sendErrorResponse(req, res, "Appointment not found.", null, 404);
         }
 
-        const blockedStatuses = ["COMPLETED", "CANCELLED", "REJECTED"];
+        const blockedStatuses = [ENUM.APPOINTMENT_STATUS.COMPLETED, ENUM.APPOINTMENT_STATUS.CANCELLED, ENUM.APPOINTMENT_STATUS.REJECTED];
         if (blockedStatuses.includes(appointment.status)) {
-            return commonUtils.sendErrorResponse(req, res, "Cannot reschedule completed, cancelled, or rejected appointments.", null, 400);
+            return commonUtils.sendErrorResponse(req, res, appString.CANNOT_RESCHEDULE_BLOCKED, null, 400);
         }
 
         // Check 60-minute 
@@ -337,11 +348,11 @@ const rescheduleAppointment = async (req, res) => {
         const minutesUntilAppointment = appointmentMoment.diff(currentMoment, "minutes");
 
         if (minutesUntilAppointment <= 0) {
-            return commonUtils.sendErrorResponse(req, res, "Cannot reschedule an appointment that has already started or passed.", null, 403);
+            return commonUtils.sendErrorResponse(req, res, appString.CANNOT_RESCHEDULE_PAST, null, 403);
         }
 
         if (minutesUntilAppointment <= 60) {
-            return commonUtils.sendErrorResponse(req, res, "Appointments starting within 60 minutes cannot be rescheduled.", null, 403);
+            return commonUtils.sendErrorResponse(req, res, appString.CANNOT_RESCHEDULE_WITHIN_60, null, 403);
         }
 
      
@@ -354,7 +365,7 @@ const rescheduleAppointment = async (req, res) => {
             doctorId: appointment.doctorId,
             date: finalDate,
             _id: { $ne: appointmentId },
-            status: { $nin: ["CANCELLED", "REJECTED"] },
+            status: { $nin: [ENUM.APPOINTMENT_STATUS.CANCELLED, ENUM.APPOINTMENT_STATUS.REJECTED] },
             $or: [
                 {
                     startTime: { $lt: finalEndTime },
@@ -364,16 +375,16 @@ const rescheduleAppointment = async (req, res) => {
         });
 
         if (overlapping) {
-            return commonUtils.sendErrorResponse(req, res, "The new time slot is already booked. Please choose a different time.", null, 409);
+            return commonUtils.sendErrorResponse(req, res, appString.NEW_SLOT_BOOKED, null, 409);
         }
 
         appointment.date = finalDate;
         appointment.startTime = finalStartTime;
         appointment.endTime = finalEndTime;
-        appointment.status = "UPCOMING";
+        appointment.status = ENUM.APPOINTMENT_STATUS.UPCOMING;
         await appointment.save();
 
-        return commonUtils.sendSuccessResponse(req, res, "Appointment rescheduled successfully.", appointment);
+        return commonUtils.sendSuccessResponse(req, res, appString.APPOINTMENT_RESCHEDULED, appointment);
     } catch (error) {
         return commonUtils.sendErrorResponse(req, res, error.message, null, 500);
     }
@@ -392,18 +403,18 @@ const cancelAppointment = async (req, res) => {
         });
 
         if (!appointment) {
-            return commonUtils.sendErrorResponse(req, res, "Appointment not found.", null, 404);
+            return commonUtils.sendErrorResponse(req, res, appString.APPOINTMENT_NOT_FOUND, null, 404);
         }
 
-        const blockedStatuses = ["COMPLETED", "CANCELLED", "REJECTED"];
+        const blockedStatuses = [ENUM.APPOINTMENT_STATUS.COMPLETED, ENUM.APPOINTMENT_STATUS.CANCELLED, ENUM.APPOINTMENT_STATUS.REJECTED];
         if (blockedStatuses.includes(appointment.status)) {
-            return commonUtils.sendErrorResponse(req, res, `Cannot cancel an appointment that is already ${appointment.status.toLowerCase()}.`, null, 400);
+            return commonUtils.sendErrorResponse(req, res, `${appString.CANNOT_CANCEL}${appointment.status.toLowerCase()}.`, null, 400);
         }
 
-        appointment.status = "CANCELLED";
+        appointment.status = ENUM.APPOINTMENT_STATUS.CANCELLED;
         await appointment.save();
 
-        return commonUtils.sendSuccessResponse(req, res, "Appointment cancelled successfully.", appointment);
+        return commonUtils.sendSuccessResponse(req, res, appString.APPOINTMENT_CANCELLED, appointment);
     } catch (error) {
         return commonUtils.sendErrorResponse(req, res, error.message, null, 500);
     }

@@ -9,7 +9,7 @@ const appString = require("../../utils/appString");
 
 const getDoctors = async (req, res) => {
     try {
-        const { search, availableDay, page = 1, limit = 10 } = req.query;
+        const { search, page = 1, limit = 10 } = req.query;
         const skip = (Number(page) - 1) * Number(limit);
 
         let query = {
@@ -22,18 +22,6 @@ const getDoctors = async (req, res) => {
         }
 
 
-         if (availableDay) {
-            const dayLower = availableDay.toLowerCase();
-            doctors = doctors.filter(doc => {
-             
-                const step3 = doc.steps?.find(s => s.data && s.data.stepKey === "step3");
-                if (!step3 || !step3.data || !step3.data.availableTimeSlots) return false;
-
-                const slots = step3.data.availableTimeSlots;
-            
-                return slots.some(slot => slot.day && slot.day.toLowerCase() === dayLower);
-            });
-        }
         const total = await Doctor.countDocuments(query);
         console.log(query)
     
@@ -136,4 +124,64 @@ const getDoctorProfile = async (req, res) => {
 };
 
 
-module.exports = { getDoctors, getDoctorProfile };
+
+//===================== Get Available Doctors Today ==================================//
+
+const getAvailableDoctorsToday = async (req, res) => {
+    try {
+        const today = new Date();
+        const year = today.getFullYear();
+        const month = String(today.getMonth() + 1).padStart(2, '0');
+        const day = String(today.getDate()).padStart(2, '0');
+        const dateString = `${year}-${month}-${day}`;
+        
+        const dayName = today.toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
+
+        let query = {
+            isAccountVerified: ENUM.ACCOUNT_VERIFIED_STATUS.VERIFIED,
+            isDeleted: ENUM.IS_DELETED.NOT_DELETED,
+        };
+
+        const fullDayLeaves = await Leave.find({
+            leaveStatus: ENUM.LEAVE_STATUS.APPROVED,
+            [`unavailableDates.${dateString}.category`]: 'full_day'
+        }).select('doctorId');
+
+        const excludedDoctorIds = fullDayLeaves.map(leave => leave.doctorId);
+        if (excludedDoctorIds.length > 0) {
+            query._id = { $nin: excludedDoctorIds };
+        }
+
+        // Filter by the required day dynamically from the database using $elemMatch
+        query["steps"] = {
+            $elemMatch: {
+                "data.stepKey": "step3",
+                "data.availableTimeSlots": {
+                    $elemMatch: {
+                        day: { $regex: new RegExp(`^${dayName}$`, "i") }
+                    }
+                }
+            }
+        };
+
+        let doctors = await Doctor.find(query)
+            .select("-password -otp -otpExpire -emailOtp -emailOtpExpire -emailOtpLastSend -mobileOtpLastSend")
+            .sort({ createdAt: -1 });
+
+        const cleanedDoctors = doctors.map(doc => {
+            const docObj = doc.toObject();
+            delete docObj.steps;
+            return docObj;
+        });
+
+        return commonUtils.sendSuccessResponse(req, res, appString.DOCTOR_GET, {
+            doctors: cleanedDoctors
+        });
+
+    } catch (error) {
+        console.error("Error fetching available doctors today:", error);
+        return commonUtils.sendErrorResponse(req, res, error.message, null, 500);
+    }
+};
+
+module.exports = { getDoctors, getDoctorProfile, getAvailableDoctorsToday };

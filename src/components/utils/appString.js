@@ -105,6 +105,18 @@ ALREADY_BOOK: "This time slot is already booked for the selected doctor. Please 
 DOCTOR_ON_LEAVE_DAY:"Doctor is on leave on this date.",
 DOCTOE_ON_LEAVE_TIMEsLOT: "Doctor is on leave during this time slot.",
 APPOINTMENT_BOOK: "Appointment booked successfully.",
+AVAILABLE_SLOTS_RETRIEVED: "Available slots retrieved successfully.",
+MISSING_BOOKING_DETAILS: "doctorId, date, startTime, and endTime are required.",
+APPOINTMENTS_RETRIEVED: "Appointments retrieved successfully.",
+APPOINTMENT_NOT_FOUND: "Appointment not found.",
+APPOINTMENT_DETAILS_RETRIEVED: "Appointment details retrieved.",
+CANNOT_RESCHEDULE_BLOCKED: "Cannot reschedule completed, cancelled, or rejected appointments.",
+CANNOT_RESCHEDULE_PAST: "Cannot reschedule an appointment that has already started or passed.",
+CANNOT_RESCHEDULE_WITHIN_60: "Appointments starting within 60 minutes cannot be rescheduled.",
+NEW_SLOT_BOOKED: "The new time slot is already booked. Please choose a different time.",
+APPOINTMENT_RESCHEDULED: "Appointment rescheduled successfully.",
+APPOINTMENT_CANCELLED: "Appointment cancelled successfully.",
+CANNOT_CANCEL: "Cannot cancel an appointment that is already ",
 
   
 

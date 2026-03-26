@@ -1,4 +1,5 @@
 const Patient = require("../model/patientModel");
+const PatientWallet = require("../model/patientWalletModel");
 const ENUM = require("../../utils/enum");
 const appStrings = require("../../utils/appString");
 const commonUtils = require("../../utils/commonUtils");
@@ -6,6 +7,7 @@ const token = require("../../../middelware/index");
 const bcrypt = require("bcrypt");
 const redisClient = require("../../utils/redisClient");
 const sendVerificationEmail = require("../../utils/emailService");
+const Settings = require("../../admin/model/settingModel");
 const config = require("../../../../config/dev.json");
 
 
@@ -44,6 +46,16 @@ const patientRegister = async (req, res) => {
         }
 
         await patient.save();
+
+        const setting = await Settings.findOne();
+        const bonus = setting && setting.patientRegistrationBonus !== undefined ? setting.patientRegistrationBonus : 1000;
+
+        const wallet = new PatientWallet({
+            patientId: patient._id,
+            balance: bonus,
+            creditAmount: bonus
+        });
+        await wallet.save();
 
     
         if (email) {

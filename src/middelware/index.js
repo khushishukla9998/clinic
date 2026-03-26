@@ -42,7 +42,7 @@ async function verifyAcessToken(req, res, next) {
         req.userId = decode.id || decode.userId;
         req.adminId = decode.id||decode.admimId;
         req.type = decode.type;
-        req.headers = decode;
+        req.user = decode;
         console.log(decode);
 
         // Check if token exists in Redis for this user

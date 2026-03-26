@@ -2,6 +2,11 @@ const { validatorUtilWithCallback } = require("../utils/commonUtils");
 
 const profileValidation = async (req, res, next) => {
     
+    // Safely initialize req.body if it's undefined (e.g., misconfigured headers)
+    if (!req.body) {
+        req.body = {};
+    }
+
     if (req.files && req.files.length > 0) {
         req.body.documents = req.files;
     }
@@ -30,6 +35,58 @@ const profileValidation = async (req, res, next) => {
     validatorUtilWithCallback(req, res, next, validationRule);
 };
 
+const registerValidation = (req, res, next) => {
+    const rules = {
+        name: "required|string",
+        email: "required|email",
+        password: "required|string|min:6",
+        mobileNo: "required|numeric",
+        country: "required|string",
+        countryCode: "required|string",
+    };
+    validatorUtilWithCallback(req, res, next, rules);
+};
+
+const loginValidation = (req, res, next) => {
+    const rules = {
+        email: "required|email",
+        password: "required|string",
+    };
+    validatorUtilWithCallback(req, res, next, rules);
+};
+
+const verifyOtpValidation = (req, res, next) => {
+    const rules = {
+        email: "required|email",
+        otp: "required",
+    };
+    validatorUtilWithCallback(req, res, next, rules);
+};
+
+const editProfileValidation = (req, res, next) => {
+    const rules = {
+        name: "string",
+        mobileNo: "numeric",
+        country: "string",
+        countryCode: "string",
+        appointmentsCharges: "numeric",
+    };
+    validatorUtilWithCallback(req, res, next, rules);
+};
+
+const requestLeaveValidation = (req, res, next) => {
+    const rules = {
+        unavailableDates: "required",
+        leaveType: "required|numeric",
+    };
+    validatorUtilWithCallback(req, res, next, rules);
+};
+
 module.exports = {
-    profileValidation
+    profileValidation,
+    registerValidation,
+    loginValidation,
+    verifyOtpValidation,
+    editProfileValidation,
+    requestLeaveValidation,
 };

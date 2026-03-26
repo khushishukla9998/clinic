@@ -1,7 +1,10 @@
 const Admin = require("../admin/model/adminModel");
 // const User = require("../user/model/userModel");
+const Appointment = require("../doctor/model/appointmentModel");
 const appStrings = require("../utils/appString");
+const ENUM = require("./enum");
 const Validator = require("validatorjs");
+const cron = require("node-cron");
 
 //========================Error Response===========================//
 const sendErrorResponse = (req, res, message, data = null, status = 400) => {
@@ -63,6 +66,14 @@ const routeArray = (array_, prefix, isAdmin = false) => {
       // }
     }
     
+    if (route.middleware) {
+      if (Array.isArray(route.middleware)) {
+        middlewares.push(...route.middleware);
+      } else {
+        middlewares.push(route.middleware);
+      }
+    }
+
     if (validation) {
       if (Array.isArray(validation)) {
         middlewares.push(...validation);
@@ -130,11 +141,48 @@ const validatorUtilWithCallback = (req, res, next, rules) => {
     }
 };
 
+const startAppointmentJobs = () => {
+    // Run the job every 1 minute using node-cron
+    cron.schedule("* * * * *", async () => {
+        try {
+            // Find 20 minutes ago
+            const twentyMinutesAgo = new Date(Date.now() - 20 * 60 * 1000);
+
+            // Find all appointments that are still PENDING and older than 20 minutes
+            const expiredAppointments = await Appointment.find({
+                status: ENUM.APPOINTMENT_STATUS.PENDING,
+                createdAt: { $lte: twentyMinutesAgo }
+            });
+
+            if (expiredAppointments.length > 0) {
+                console.log(`[Job] Found ${expiredAppointments.length} expired appointments. Cancelling them...`);
+
+                const idsToCancel = expiredAppointments.map(app => app._id);
+
+                // Update their statuses to CANCELLED
+                await Appointment.updateMany(
+                    { _id: { $in: idsToCancel } },
+                    { 
+                        $set: { 
+                            status: ENUM.APPOINTMENT_STATUS.CANCELLED
+                        } 
+                    }
+                );
+
+                console.log(`[Job] Successfully auto-cancelled ${expiredAppointments.length} pending appointments.`);
+            }
+        } catch (error) {
+            console.error("[Job Error] Failed to process auto-cancellation of appointments:", error);
+        }
+    }); // node-cron schedule ends here
+};
+
 module.exports = {
     sendErrorResponse,
     sendSuccessResponse,
     storeAcessTokenInCookie,
     storeRefreshTokenInCookie,
     routeArray,
-    validatorUtilWithCallback
+    validatorUtilWithCallback,
+    startAppointmentJobs
 };
